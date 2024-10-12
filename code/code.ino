@@ -145,7 +145,7 @@ void setup(){
     ouvrirBarriere();
 }
 
-
+g
 // lecture des états 
 void loop(){
 

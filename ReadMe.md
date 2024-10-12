@@ -8,9 +8,9 @@
 
 ## Materiel 
 
-- 1 x [MP1 V2](www.mtb-model.com)
+- 1 x [MP1 V2](www.mtb-model.com), pour actionner les barrieres
 - 4 x capteurs de presence, 2 par voie: un en entrée et un en sortie
-- 2 x module de relais Songle, pour le mechanisme des barrières
+- 2 x module de relais Songle
 - 2 x leds rouges, pour les feux de signalisation
 - 2 x resistance 220 Ohm
 - 4 x resistance 10k Ohm
