@@ -1,32 +1,28 @@
 
 /* ------------- PARTIE MODIFIABLE DU CODE ---------------*/
 
-// vitesse de clignotement 
+// vitesse de clignotement
 #define tempsAvantClignotement 1000
-#define nombreClignotement 3
+#define nombreClignotementAvantAction 2
 #define vitesseClignotementPortionLumineuse 2
 #define vitesseClignotementPortionSombre 3
 
-// pour supprimer les rebonds du scapteurs 
+// pour supprimer les rebonds du scapteurs
 #define tempsMinimumEntreDeuxTrain 1000
 #define tempsQuePrendLeTrainPourArriverAuPassageaNivau 3000
 
-// angles des servomoteurs ouverts et fermés
-#define angleOuvert 0
-#define angleFerme 90
-
 /* --------------------------------------------------------*/
 
-
 #include "PinChangeInterrupt.h"
-#define boutonEntreeGauche 8
-#define boutonEntreeDroite 9
+#define boutonEntreeGauche 11
 #define boutonSortieGauche 10
-#define boutonSortieDroite 11
+#define boutonEntreeDroite 9
+#define boutonSortieDroite 8
 
-#include <Servo.h>
-Servo servos_barrieres;
-#define portArduino_Barrieres 3
+#define relais_Open 4
+#define relais_Close 5
+#define timeDelta 500
+#define actionBarriereDelta 3000
 
 bool voieOuverte = true;
 bool unTrainArriveaGauche = false;
@@ -34,131 +30,184 @@ long int derniereArriveaGauche = -1;
 bool unTrainArriveaDroite = false;
 long int derniereArriveaDroite = -1;
 
-void trainGaucheArrive(){
-  if(derniereArriveaGauche == -1){
+void trainGaucheArrive()
+{
+  if (derniereArriveaGauche == -1)
+  {
     derniereArriveaGauche = millis();
     unTrainArriveaGauche = true;
-  }else{
+  }
+  else
+  {
     long int maintenant = millis();
-    if(maintenant - derniereArriveaGauche > tempsMinimumEntreDeuxTrain){
-       derniereArriveaGauche = maintenant;
-       unTrainArriveaGauche = true;
+    if (maintenant - derniereArriveaGauche > tempsMinimumEntreDeuxTrain)
+    {
+      derniereArriveaGauche = maintenant;
+      unTrainArriveaGauche = true;
     }
   }
 }
-void trainGaucheSort(){
+void trainGaucheSort()
+{
   long int maintenant = millis();
-  if(derniereArriveaGauche != -1 && (maintenant - derniereArriveaGauche > tempsQuePrendLeTrainPourArriverAuPassageaNivau)){
+  if (derniereArriveaGauche != -1 && (maintenant - derniereArriveaGauche > tempsQuePrendLeTrainPourArriverAuPassageaNivau))
+  {
     unTrainArriveaGauche = false;
   }
 }
-void trainDroiteArrive(){
-if(derniereArriveaDroite == -1){
+void trainDroiteArrive()
+{
+  if (derniereArriveaDroite == -1)
+  {
     derniereArriveaDroite = millis();
     unTrainArriveaDroite = true;
-  }else{
+  }
+  else
+  {
     long int maintenant = millis();
-    if(maintenant - derniereArriveaDroite > tempsMinimumEntreDeuxTrain){
-       derniereArriveaDroite = maintenant;
-       unTrainArriveaDroite = true;
+    if (maintenant - derniereArriveaDroite > tempsMinimumEntreDeuxTrain)
+    {
+      derniereArriveaDroite = maintenant;
+      unTrainArriveaDroite = true;
     }
   }
 }
-void trainDroiteSort(){
+void trainDroiteSort()
+{
   long int maintenant = millis();
-  if(derniereArriveaDroite != -1 && (maintenant - derniereArriveaDroite > tempsQuePrendLeTrainPourArriverAuPassageaNivau)){
+  if (derniereArriveaDroite != -1 && (maintenant - derniereArriveaDroite > tempsQuePrendLeTrainPourArriverAuPassageaNivau))
+  {
     unTrainArriveaDroite = false;
   }
-}  
+}
 
-#define led1_Pin 5
-#define led2_Pin 6
+#define led1_Pin 3
+#define led2_Pin 2
 int timer = 0;
 void clignoterAccendant()
 {
-      for(int i = 0; i<=255;i+=1){
-      if(i<155){
-        timer = vitesseClignotementPortionSombre;
-      }else{
-        timer = vitesseClignotementPortionLumineuse;
-      }
-       analogWrite(led1_Pin, i);
-       analogWrite(led2_Pin, i);
-       delay(timer);
+  for (int i = 0; i <= 255; i += 1)
+  {
+    if (i < 155)
+    {
+      timer = vitesseClignotementPortionSombre;
     }
-}
-void clignoterDescendant(){
-  for(int i = 254; i>0;i-=1){
-      if(i<155){
-         timer = vitesseClignotementPortionSombre;
-      }else{
-         timer = vitesseClignotementPortionLumineuse;
-      }
-      analogWrite(led1_Pin, i);
-      analogWrite(led2_Pin, i);
-      delay(timer);
-   }
-}
-
-void ouvrirBarriere(){
-    // eteindre les leds 
-    analogWrite(led1_Pin, 0);
-    analogWrite(led2_Pin, 0);
-  
-   // ouvrir les servomoteurs 
-   servos_barrieres.write(angleOuvert);
-}
-void fermerBarriere(){
-    // attendre un peu
-    delay(tempsAvantClignotement);
-    
-    // clignoter
-    for(int x=1; x<=nombreClignotement; x++){
-      clignoterAccendant();
-      delay(100);
-      if(x < nombreClignotement){
-        clignoterDescendant();
-      }
+    else
+    {
+      timer = vitesseClignotementPortionLumineuse;
     }
-    // fermer les servomoteurs
-    servos_barrieres.write(angleFerme);
+    analogWrite(led1_Pin, i);
+    analogWrite(led2_Pin, i);
+    delay(timer);
+  }
+}
+void clignoterDescendant()
+{
+  for (int i = 254; i > 0; i -= 1)
+  {
+    if (i < 155)
+    {
+      timer = vitesseClignotementPortionSombre;
+    }
+    else
+    {
+      timer = vitesseClignotementPortionLumineuse;
+    }
+    analogWrite(led1_Pin, i);
+    analogWrite(led2_Pin, i);
+    delay(timer);
+  }
 }
 
-// configuration 
-void setup(){
-    pinMode(led2_Pin, OUTPUT);
-    pinMode(led1_Pin, OUTPUT);
-  
-    pinMode(boutonEntreeGauche, INPUT);
-    attachPCINT(digitalPinToPCINT(boutonEntreeGauche), trainGaucheArrive, RISING);
-        
-    pinMode(boutonSortieGauche, INPUT);
-    attachPCINT(digitalPinToPCINT(boutonSortieGauche), trainGaucheSort, RISING);
-        
-    pinMode(boutonEntreeDroite, INPUT);
-    attachPCINT(digitalPinToPCINT(boutonEntreeDroite), trainDroiteArrive, RISING);
-    
-    pinMode(boutonSortieDroite, INPUT);
-    attachPCINT(digitalPinToPCINT(boutonSortieDroite), trainDroiteSort, RISING);
+void ouvrirBarriere()
+{
+  // eteindre les leds
+  analogWrite(led1_Pin, 0);
+  analogWrite(led2_Pin, 0);
 
-    servos_barrieres.attach(portArduino_Barrieres);
-    ouvrirBarriere();
+  // ouvrir les barrieres
+  digitalWrite(relais_Open, HIGH);
+  delay(actionBarriereDelta);
+  digitalWrite(relais_Open, LOW);
+}
+void fermerBarriere()
+{
+  // attendre un peu
+  delay(tempsAvantClignotement);
+
+  // clignoter
+  for (int x = 0; x < nombreClignotementAvantAction; x++)
+  {
+    clignoterAccendant();
+    delay(100);
+    clignoterDescendant();
+  }
+
+  // clignoter + fermer les barrieres
+  digitalWrite(relais_Close, HIGH);
+  int start = millis();
+  while (millis() - start < actionBarriereDelta)
+  {
+    clignoterAccendant();
+    delay(100);
+    clignoterDescendant();
+  }
+  digitalWrite(relais_Close, LOW);
 }
 
-g
-// lecture des états 
-void loop(){
+// configuration
+void setup()
+{
+  /*------- define the inputs -------*/
+  pinMode(boutonEntreeGauche, INPUT);
+  attachPCINT(digitalPinToPCINT(boutonEntreeGauche), trainGaucheArrive, RISING);
 
+  pinMode(boutonSortieGauche, INPUT);
+  attachPCINT(digitalPinToPCINT(boutonSortieGauche), trainGaucheSort, RISING);
+
+  pinMode(boutonEntreeDroite, INPUT);
+  attachPCINT(digitalPinToPCINT(boutonEntreeDroite), trainDroiteArrive, RISING);
+
+  pinMode(boutonSortieDroite, INPUT);
+  attachPCINT(digitalPinToPCINT(boutonSortieDroite), trainDroiteSort, RISING);
+
+  /*------- define the outputs -------*/
+  pinMode(led2_Pin, OUTPUT);
+  pinMode(led1_Pin, OUTPUT);
+
+  pinMode(relais_Close, OUTPUT);
+  digitalWrite(relais_Close, LOW);
+
+  pinMode(relais_Open, LOW);
+  digitalWrite(relais_Open, LOW);
+
+  ouvrirBarriere();
+}
+
+// lecture des états
+void loop()
+{
   /* Finite State Machine */
-  if(voieOuverte && (unTrainArriveaGauche || unTrainArriveaDroite)){
+  if (voieOuverte && (unTrainArriveaGauche || unTrainArriveaDroite))
+  {
     /* FERMER LES VOIES */
     fermerBarriere();
     voieOuverte = false;
-  }else{
-    if (!voieOuverte && !unTrainArriveaGauche && !unTrainArriveaDroite){
+  }
+  else
+  {
+    if (!voieOuverte && !unTrainArriveaGauche && !unTrainArriveaDroite)
+    {
       /* OUVRIR LES VOIES */
       ouvrirBarriere();
       voieOuverte = true;
+    }
+    else
+    {
+      /* CLIGNOTER */
+      clignoterAccendant();
+      delay(100);
+      clignoterDescendant();
     }
   }
 }

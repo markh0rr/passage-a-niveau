@@ -21,3 +21,6 @@
 
 ## Code 
 
+Le code a besoin de la librarie [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) pour être notifié par les capteurs de présence.
+
+Installation depuis le logiciel Arduino dans Outils > Gérer les bibliothèques > "PinChangeInt" > Installer.
