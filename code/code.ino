@@ -178,7 +178,7 @@ void setup()
   pinMode(relais_Close, OUTPUT);
   digitalWrite(relais_Close, LOW);
 
-  pinMode(relais_Open, LOW);
+  pinMode(relais_Open, OUTPUT);
   digitalWrite(relais_Open, LOW);
 
   ouvrirBarriere();
